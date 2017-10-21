@@ -1,77 +1,132 @@
-(* simple timer *)
+module type InputS = sig
+  val timer_name : string
 
-let str_of_pos x =
-  let fname = x.Lexing.pos_fname in
-  let lnum = x.Lexing.pos_lnum in
-  fname^":"^string_of_int lnum
+  type data
 
-module Simple = struct
+  val init_data : data
 
-  let data = ref None
+  val mod_data_start : string -> data -> data
 
-  let print_time_end title t =
-    prerr_endline ("[timer]:"^title^" "^string_of_float t)
+  val mod_data_end : data -> data
 
-  let end_ () =
-    match !data with
-    | None -> ()
-    | Some (prev_title, prev_t) ->
-      print_time_end prev_title (Sys.time () -. prev_t);
-      data := None
+  val get_time_end : data -> (string * float) option
 
-  let start title =
-    end_ ();
-    data := Some (title, Sys.time ())
-
-  let start_here x = start (str_of_pos x)
+  val get_times_flush : data -> (string * float) list option
 end
 
-(* timer for accumulation *)
+module type S = sig
+  val start : string -> unit
+
+  val start_here : Lexing.position -> unit
+
+  val end_ : unit -> unit
+
+  val flush : unit -> unit
+end
+
+module Make (T : InputS) : S = struct
+  let print_time (name, t) =
+    prerr_endline ("["^T.timer_name^"]"^name^":"^string_of_float t)
+
+  let data_ref = ref T.init_data
+
+  let end_ () =
+    (match T.get_time_end !data_ref with
+     | Some time -> print_time time
+     | None -> ());
+    data_ref := T.mod_data_end !data_ref
+
+  let start name =
+    end_ ();
+    data_ref := T.mod_data_start name !data_ref
+
+  let flush () =
+    end_ ();
+    (match T.get_times_flush !data_ref with
+     | Some times -> List.iter print_time times
+     | None -> ());
+    data_ref := T.init_data
+
+  let start_here pos =
+    let fname = pos.Lexing.pos_fname in
+    let lnum = pos.Lexing.pos_lnum in
+    start (fname^":"^string_of_int lnum)
+end
+
+module Simple = struct
+  let timer_name = "timer"
+
+  type data = (string * float) option
+
+  let init_data = None
+
+  let mod_data_start name _ = Some (name, Sys.time ())
+
+  let mod_data_end _ = None
+
+  let get_time_end = function
+    | None -> None
+    | Some (name, start) -> Some (name, Sys.time () -. start)
+
+  let get_times_flush _ = None
+end
 
 module Acc = struct
 
+  let timer_name = "acc timer"
+
   module M = Map.Make (String)
 
-  let data = ref None
+  type data = {
+    cur_opt : Simple.data;
+    all : float M.t;
+  }
 
-  let map = ref M.empty
+  let init_data = {
+    cur_opt = Simple.init_data;
+    all = M.empty
+  }
 
-  let acc_time title new_t =
-    let t = try M.find title !map with Not_found -> 0.0 in
-    map := M.add title (t +. new_t) !map
+  let add_time name time all =
+    let all_time = try M.find name all with Not_found -> 0.0 in
+    M.add name (time +. all_time) all
 
-  let end_ () =
-    match !data with
-    | None -> ()
-    | Some (prev_title, prev_t) ->
-      acc_time prev_title (Sys.time () -. prev_t);
-      data := None
+  let add_cur_opt cur_opt all =
+    match Simple.get_time_end cur_opt with
+    | None -> all
+    | Some (name, time) -> add_time name time all
 
-  let start title =
-    end_ ();
-    data := Some (title, Sys.time ())
+  let mod_data_start title {cur_opt; all} =
+    let all = add_cur_opt cur_opt all in
+    {cur_opt = Some (title, Sys.time ()); all}
 
-  let start_here x = start (str_of_pos x)
+  let mod_data_end {cur_opt; all} =
+    let all = add_cur_opt cur_opt all in
+    let cur_opt = Simple.mod_data_end cur_opt in
+    {cur_opt; all}
 
-  let flush () =
-    let print1 title t =
-      prerr_endline ("[acc timer]:"^title^" "^string_of_float t)
-    in
-    end_ ();
-    M.iter print1 !map;
-    map := M.empty
+  let get_time_end _ = None
+
+  let get_times_flush {all} =
+    M.fold (fun name time acc -> (name, time) :: acc) all []
+    |> List.rev
+    |> fun x -> Some x
 end
 
-let start = Simple.start
+module SimpleTimer = Make (Simple)
 
-let end_ = Simple.end_
+let start = SimpleTimer.start
 
-let start_here = Simple.start_here
+let start_here = SimpleTimer.start_here
 
-let acc_start = Acc.start
+let end_ = SimpleTimer.end_
 
-let acc_end = Acc.end_
+module AccTimer = Make (Acc)
 
-let acc_start_here = Acc.start_here
+let acc_start = AccTimer.start
 
-let acc_flush = Acc.flush
+let acc_start_here = AccTimer.start_here
+
+let acc_end = AccTimer.end_
+
+let acc_flush = AccTimer.flush
