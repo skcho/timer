@@ -7,9 +7,9 @@ module type InputS = sig
 
   val mod_data_start : string -> data -> data
 
-  val mod_data_end : data -> data
+  val mod_data_stop : data -> data
 
-  val get_time_end : data -> (string * float) option
+  val get_time_stop : data -> (string * float) option
 
   val get_times_flush : data -> (string * float) list option
 end
@@ -19,7 +19,7 @@ module type S = sig
 
   val start_here : Lexing.position -> unit
 
-  val end_ : unit -> unit
+  val stop : unit -> unit
 
   val flush : unit -> unit
 end
@@ -31,20 +31,20 @@ module Make (T : InputS) : S = struct
 
   let data_ref = ref T.init_data
 
-  let end_ () =
-    ( match T.get_time_end !data_ref with
+  let stop () =
+    ( match T.get_time_stop !data_ref with
     | Some time -> print_time time
     | None -> () ) ;
-    data_ref := T.mod_data_end !data_ref
+    data_ref := T.mod_data_stop !data_ref
 
 
   let start name =
-    end_ () ;
+    stop () ;
     data_ref := T.mod_data_start name !data_ref
 
 
   let flush () =
-    end_ () ;
+    stop () ;
     ( match T.get_times_flush !data_ref with
     | Some times -> List.iter print_time times
     | None -> () ) ;
@@ -67,9 +67,9 @@ module Simple = struct
 
   let mod_data_start name _ = Some (name, Sys.time ())
 
-  let mod_data_end _ = None
+  let mod_data_stop _ = None
 
-  let get_time_end = function
+  let get_time_stop = function
     | None -> None
     | Some (name, start) -> Some (name, Sys.time () -. start)
 
@@ -95,7 +95,7 @@ module Acc = struct
 
 
   let add_cur_opt cur_opt all =
-    match Simple.get_time_end cur_opt with
+    match Simple.get_time_stop cur_opt with
     | None -> all
     | Some (name, time) -> add_time name time all
 
@@ -105,13 +105,13 @@ module Acc = struct
     {cur_opt= Some (title, Sys.time ()); all}
 
 
-  let mod_data_end {cur_opt; all} =
+  let mod_data_stop {cur_opt; all} =
     let all = add_cur_opt cur_opt all in
-    let cur_opt = Simple.mod_data_end cur_opt in
+    let cur_opt = Simple.mod_data_stop cur_opt in
     {cur_opt; all}
 
 
-  let get_time_end _ = None
+  let get_time_stop _ = None
 
   let get_times_flush {all} =
     M.fold (fun name time acc -> (name, time) :: acc) all [] |> List.rev
@@ -125,7 +125,7 @@ let start = SimpleTimer.start
 
 let start_here = SimpleTimer.start_here
 
-let end_ = SimpleTimer.end_
+let stop = SimpleTimer.stop
 
 module AccTimer = Make (Acc)
 
@@ -133,6 +133,6 @@ let acc_start = AccTimer.start
 
 let acc_start_here = AccTimer.start_here
 
-let acc_end = AccTimer.end_
+let acc_stop = AccTimer.stop
 
 let acc_flush = AccTimer.flush

@@ -9,7 +9,7 @@ let simple () =
   Timer.start "simple2" ;
   do_sth () ;
   do_sth () ;
-  Timer.end_ () ;
+  Timer.stop () ;
   ()
 
 
@@ -19,7 +19,7 @@ let here () =
   Timer.start_here [%here ] ;
   do_sth () ;
   do_sth () ;
-  Timer.end_ () ;
+  Timer.stop () ;
   ()
 
 
@@ -30,7 +30,7 @@ let acc () =
     Timer.acc_start_here [%here ] ;
     do_sth () ;
     do_sth () ;
-    Timer.acc_end ()
+    Timer.acc_stop ()
   in
   List.iter f [(); ()] ;
   Timer.acc_flush ()
@@ -52,9 +52,9 @@ let my_timer () =
   MyTimer1.start_here [%here ] ;
   MyTimer2.start_here [%here ] ;
   do_sth () ;
-  MyTimer1.end_ () ;
+  MyTimer1.stop () ;
   do_sth () ;
-  MyTimer2.end_ ()
+  MyTimer2.stop ()
 
 
 let test title f =
