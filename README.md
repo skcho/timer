@@ -2,26 +2,32 @@
 
 a simple timer for OCaml
 
-## use
+## example
 
 simple case
 
 ```ocaml
-Timer.start "a"; (* timer "a" start *)
+Timer.start "a"; (* Timer "a" starts. *)
 ...
-Timer.start "b"; (* timer "a" end + print "a" time + timer "b" start *)
+Timer.start "b"; (* Timer "a" stops. Time of "a" is printed.
+                    Timer "b" starts. *)
 ...
-Timer.end_ () (* timer "b" end + print "b" time *)
+Timer.stop ()    (* Timer "b" stops. Time of "b" is printed. *)
 ```
 
-timer for loop
+timer for accumulated time
 
 ```ocaml
 let foo x =
-  Timer.acc_start "a"; (* timer "a" start *)
+  Timer.acc_start "a"; (* Timer "a" starts. *)
   ...
-  Timer.acc_end () (* timer "a" end + the time is accumulated *)
+  Timer.acc_start "b"; (* Timer "a" stops. Time of "a" is accumulated.
+                          Timer "b" starts. *)
+  ...
+  Timer.acc_stop ()    (* Timer "b" stops. Time of "b" is accumulated. *)
 in
-iter foo l;
-Timer.acc_flush (* print accumulated "a" time *)
+List.iter foo l;
+Timer.acc_flush        (* All accumulated times are printed. *)
 ```
+
+See [test.ml](test.ml) for more cases.
