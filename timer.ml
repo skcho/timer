@@ -1,14 +1,16 @@
 (* simple timer *)
 
+let str_of_pos x =
+  let fname = x.Lexing.pos_fname in
+  let lnum = x.Lexing.pos_lnum in
+  fname^":"^string_of_int lnum
+
 module Simple = struct
 
   let data = ref None
 
-  let print_time_start title =
-    prerr_endline ("Timer start:"^title)
-
   let print_time_end title t =
-    prerr_endline ("Timer end:"^title^" "^string_of_float t)
+    prerr_endline ("[timer]:"^title^" "^string_of_float t)
 
   let end_ () =
     match !data with
@@ -19,8 +21,9 @@ module Simple = struct
 
   let start title =
     end_ ();
-    data := Some (title, Sys.time ());
-    print_time_start title
+    data := Some (title, Sys.time ())
+
+  let start_here x = start (str_of_pos x)
 end
 
 (* timer for accumulation *)
@@ -48,9 +51,11 @@ module Acc = struct
     end_ ();
     data := Some (title, Sys.time ())
 
+  let start_here x = start (str_of_pos x)
+
   let flush () =
     let print1 title t =
-      prerr_endline ("Acc Timer:"^title^" "^string_of_float t)
+      prerr_endline ("[acc timer]:"^title^" "^string_of_float t)
     in
     end_ ();
     M.iter print1 !map;
@@ -61,8 +66,12 @@ let start = Simple.start
 
 let end_ = Simple.end_
 
+let start_here = Simple.start_here
+
 let acc_start = Acc.start
 
 let acc_end = Acc.end_
+
+let acc_start_here = Acc.start_here
 
 let acc_flush = Acc.flush
