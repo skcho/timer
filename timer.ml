@@ -26,7 +26,7 @@ end
 
 module Make (T : InputS) : S = struct
   let print_time (name, t) =
-    prerr_endline ("["^T.timer_name^"]"^name^":"^string_of_float t)
+    Printf.fprintf stderr "[%s] %s\t%.3f\n%!" T.timer_name name t
 
   let data_ref = ref T.init_data
 

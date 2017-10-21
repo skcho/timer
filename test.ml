@@ -32,8 +32,31 @@ let acc () =
   List.iter f [(); ()];
   Timer.acc_flush ()
 
-let () = simple ()
+module MyTimer1 = Timer.Make (struct
+    include Timer.Simple
+    let timer_name = "timer1"
+  end)
 
-let () = here ()
+module MyTimer2 = Timer.Make (struct
+    include Timer.Simple
+    let timer_name = "timer2"
+  end)
 
-let () = acc ()
+let my_timer () =
+  MyTimer1.start_here [%here];
+  MyTimer2.start_here [%here];
+  do_sth ();
+  MyTimer1.end_ ();
+  do_sth ();
+  MyTimer2.end_ ()
+
+let test title f =
+  prerr_endline ("TEST: "^title);
+  f ();
+  prerr_newline ()
+
+let () =
+  test "simple timer" simple;
+  test "simple timer + ppx_here" here;
+  test "accumulate timer + ppx_here" acc;
+  test "multiple timers + ppx_here" my_timer
