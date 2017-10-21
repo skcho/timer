@@ -9,8 +9,7 @@ let simple () =
   Timer.start "simple2" ;
   do_sth () ;
   do_sth () ;
-  Timer.stop () ;
-  ()
+  Timer.stop ()
 
 
 let here () =
@@ -19,8 +18,7 @@ let here () =
   Timer.start_here [%here ] ;
   do_sth () ;
   do_sth () ;
-  Timer.stop () ;
-  ()
+  Timer.stop ()
 
 
 let acc () =
