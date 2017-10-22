@@ -18,9 +18,9 @@ let simple () =
 
 let simple_here () =
   let f () =
-    Timer.start_here [%here ] ;
+    Timer.start_here [%here] ;
     do_sth () ;
-    Timer.start_here [%here ] ;
+    Timer.start_here [%here] ;
     do_sth () ;
     do_sth () ;
     Timer.stop ()
@@ -42,8 +42,8 @@ module MyTimerB = Timer.Make (struct
 end)
 
 let my_timer () =
-  MyTimerA.start_here [%here ] ;
-  MyTimerB.start_here [%here ] ;
+  MyTimerA.start_here [%here] ;
+  MyTimerB.start_here [%here] ;
   do_sth () ;
   MyTimerA.stop () ;
   do_sth () ;
@@ -62,4 +62,3 @@ let () =
   test "simple timer" simple ;
   test "simple timer + ppx_here" simple_here ;
   test "multiple timers + ppx_here" my_timer
-

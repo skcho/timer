@@ -1,10 +1,17 @@
-.PHONY: all test clean
+.PHONY: all timer install uninstall test clean
 
-all:
-	ocamlbuild -use-ocamlfind test.native
+timer:
+	jbuilder build @install src/timer.cmxa
 
-test: all
-	./test.native
+install:
+	jbuilder install timer
+
+uninstall:
+	jbuilder uninstall timer
+
+test:
+	jbuilder build test/test.exe
+	_build/default/test/test.exe
 
 clean:
-	ocamlbuild -clean
+	jbuilder clean

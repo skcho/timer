@@ -1,0 +1,6 @@
+(executable
+ ((name test)
+  (libraries (timer))
+  (preprocess (pps (ppx_here)))))
+
+(jbuild_version 1)
