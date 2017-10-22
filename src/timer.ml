@@ -6,8 +6,7 @@ module Key = struct
   let string_of = function
     | Str s -> s
     | Pos {Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum} ->
-        pos_fname ^ ":" ^ string_of_int pos_lnum ^ ":"
-        ^ string_of_int (pos_cnum - pos_bol)
+      Printf.sprintf "%s:%d:%d" pos_fname pos_lnum (pos_cnum - pos_bol)
 
 end
 

@@ -15,6 +15,5 @@ depends: [
   "jbuilder"
   "ppx_core"
   "ppx_driver"
-  "ppx_here"
 ]
 descr: "A simple timer for performance debugging"

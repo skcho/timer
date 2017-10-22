@@ -4,5 +4,5 @@
  ((name ppx_timer)
   (public_name ppx_timer)
   (kind ppx_rewriter)
-  (libraries (ppx_core ppx_driver ppx_here.expander))
+  (libraries (ppx_core ppx_driver))
   (preprocess no_preprocessing)))

@@ -4,10 +4,23 @@ open Ast_pattern
 open Asttypes
 module Timer = Timer
 
+let lift_position ~loc p =
+  let lid_of s = {txt= Longident.parse ("Lexing."^s); loc} in
+  let str_of s = Exp.constant (Pconst_string (s, None)) in
+  let int_of i = Exp.constant (Pconst_integer (Caml.string_of_int i, None)) in
+  Exp.record
+    [ (lid_of "pos_fname", str_of p.pos_fname)
+    ; (lid_of "pos_lnum", int_of p.pos_lnum)
+    ; (lid_of "pos_bol", int_of p.pos_bol)
+    ; (lid_of "pos_cnum", int_of p.pos_cnum) ]
+    None
+
+let lift_location ~loc = lift_position ~loc loc.loc_start
+
 let timer_start ~loc =
   Exp.apply
     (Exp.ident {txt= Longident.parse "Timer.start_here"; loc})
-    [(Nolabel, Ppx_here_expander.lift_position ~loc)]
+    [(Nolabel, lift_location ~loc)]
 
 
 let timer_stop ~loc =
