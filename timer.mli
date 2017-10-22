@@ -9,9 +9,7 @@ module type InputS = sig
 
   val mod_data_stop : data -> data
 
-  val get_time_stop : data -> (string * float) option
-
-  val get_times_flush : data -> (string * float) list option
+  val get_times_flush : data -> (string * float) list
 end
 
 module type S = sig
@@ -26,8 +24,6 @@ end
 
 module Make (T : InputS) : S
 
-module Simple : InputS
-
 module Acc : InputS
 
 val start : string -> unit
@@ -36,10 +32,4 @@ val start_here : Lexing.position -> unit
 
 val stop : unit -> unit
 
-val acc_start : string -> unit
-
-val acc_start_here : Lexing.position -> unit
-
-val acc_stop : unit -> unit
-
-val acc_flush : unit -> unit
+val flush : unit -> unit

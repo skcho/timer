@@ -9,9 +9,7 @@ module type InputS = sig
 
   val mod_data_stop : data -> data
 
-  val get_time_stop : data -> (string * float) option
-
-  val get_times_flush : data -> (string * float) list option
+  val get_times_flush : data -> (string * float) list
 end
 
 module type S = sig
@@ -31,12 +29,7 @@ module Make (T : InputS) : S = struct
 
   let data_ref = ref T.init_data
 
-  let stop () =
-    ( match T.get_time_stop !data_ref with
-    | Some time -> print_time time
-    | None -> () ) ;
-    data_ref := T.mod_data_stop !data_ref
-
+  let stop () = data_ref := T.mod_data_stop !data_ref
 
   let start name =
     stop () ;
@@ -45,9 +38,7 @@ module Make (T : InputS) : S = struct
 
   let flush () =
     stop () ;
-    ( match T.get_times_flush !data_ref with
-    | Some times -> List.iter print_time times
-    | None -> () ) ;
+    List.iter print_time (T.get_times_flush !data_ref) ;
     data_ref := T.init_data
 
 
@@ -58,33 +49,14 @@ module Make (T : InputS) : S = struct
 
 end
 
-module Simple = struct
-  let timer_name = "timer"
-
-  type data = (string * float) option
-
-  let init_data = None
-
-  let mod_data_start name _ = Some (name, Sys.time ())
-
-  let mod_data_stop _ = None
-
-  let get_time_stop = function
-    | None -> None
-    | Some (name, start) -> Some (name, Sys.time () -. start)
-
-
-  let get_times_flush _ = None
-end
-
 module Acc = struct
-  let timer_name = "acc timer"
+  let timer_name = "timer"
 
   module M = Map.Make (String)
 
-  type data = {cur_opt: Simple.data; all: float M.t}
+  type data = {cur_opt: (string * float) option; all: float M.t}
 
-  let init_data = {cur_opt= Simple.init_data; all= M.empty}
+  let init_data = {cur_opt= None; all= M.empty}
 
   let add_time name time all =
     let all_time =
@@ -95,44 +67,22 @@ module Acc = struct
 
 
   let add_cur_opt cur_opt all =
-    match Simple.get_time_stop cur_opt with
+    match cur_opt with
     | None -> all
-    | Some (name, time) -> add_time name time all
+    | Some (name, start) -> add_time name (Sys.time () -. start) all
 
 
   let mod_data_start title {cur_opt; all} =
-    let all = add_cur_opt cur_opt all in
-    {cur_opt= Some (title, Sys.time ()); all}
+    {cur_opt= Some (title, Sys.time ()); all = add_cur_opt cur_opt all}
 
 
   let mod_data_stop {cur_opt; all} =
-    let all = add_cur_opt cur_opt all in
-    let cur_opt = Simple.mod_data_stop cur_opt in
-    {cur_opt; all}
+    {cur_opt = None; all = add_cur_opt cur_opt all}
 
-
-  let get_time_stop _ = None
 
   let get_times_flush {all} =
     M.fold (fun name time acc -> (name, time) :: acc) all [] |> List.rev
-    |> fun x -> Some x
 
 end
 
-module SimpleTimer = Make (Simple)
-
-let start = SimpleTimer.start
-
-let start_here = SimpleTimer.start_here
-
-let stop = SimpleTimer.stop
-
-module AccTimer = Make (Acc)
-
-let acc_start = AccTimer.start
-
-let acc_start_here = AccTimer.start_here
-
-let acc_stop = AccTimer.stop
-
-let acc_flush = AccTimer.flush
+include Make (Acc)

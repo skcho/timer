@@ -4,55 +4,52 @@ let do_sth () =
 
 
 let simple () =
-  Timer.start "simple1" ;
-  do_sth () ;
-  Timer.start "simple2" ;
-  do_sth () ;
-  do_sth () ;
-  Timer.stop ()
-
-
-let here () =
-  Timer.start_here [%here ] ;
-  do_sth () ;
-  Timer.start_here [%here ] ;
-  do_sth () ;
-  do_sth () ;
-  Timer.stop ()
-
-
-let acc () =
   let f () =
-    Timer.acc_start_here [%here ] ;
+    Timer.start "a" ;
     do_sth () ;
-    Timer.acc_start_here [%here ] ;
+    Timer.start "b" ;
     do_sth () ;
     do_sth () ;
-    Timer.acc_stop ()
+    Timer.stop ()
   in
   List.iter f [(); ()] ;
-  Timer.acc_flush ()
+  Timer.flush ()
 
 
-module MyTimer1 = Timer.Make (struct
-  include Timer.Simple
+let simple_here () =
+  let f () =
+    Timer.start_here [%here ] ;
+    do_sth () ;
+    Timer.start_here [%here ] ;
+    do_sth () ;
+    do_sth () ;
+    Timer.stop ()
+  in
+  List.iter f [(); ()] ;
+  Timer.flush ()
 
-  let timer_name = "timer1"
+
+module MyTimerA = Timer.Make (struct
+  include Timer.Acc
+
+  let timer_name = "my timer A"
 end)
 
-module MyTimer2 = Timer.Make (struct
-  include Timer.Simple
+module MyTimerB = Timer.Make (struct
+  include Timer.Acc
 
-  let timer_name = "timer2"
+  let timer_name = "my timer B"
 end)
 
 let my_timer () =
-  MyTimer1.start_here [%here ] ;
-  MyTimer2.start_here [%here ] ;
+  MyTimerA.start_here [%here ] ;
+  MyTimerB.start_here [%here ] ;
   do_sth () ;
-  MyTimer1.stop () ;
+  MyTimerA.stop () ;
   do_sth () ;
-  MyTimer2.stop ()
+  MyTimerB.stop () ;
+  MyTimerA.flush () ;
+  MyTimerB.flush ()
 
 
 let test title f =
@@ -63,7 +60,6 @@ let test title f =
 
 let () =
   test "simple timer" simple ;
-  test "simple timer + ppx_here" here ;
-  test "accumulate timer + ppx_here" acc ;
+  test "simple timer + ppx_here" simple_here ;
   test "multiple timers + ppx_here" my_timer
 
