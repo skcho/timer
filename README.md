@@ -2,9 +2,17 @@
 
 a simple timer for OCaml
 
+## install
+
+```
+opam pin add ppx_timer https://github.com/skcho/ppx_timer.git
+```
+
 ## example
 
 ```ocaml
+open Ppx_timer
+
 let foo x =
   Timer.start "a"; (* Timer "a" starts. *)
   ...
