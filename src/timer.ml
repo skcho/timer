@@ -1,3 +1,17 @@
+module Key = struct
+  type t =
+    | Str of string
+    | Pos of Lexing.position
+
+  let compare = compare
+
+  let string_of = function
+    | Str s -> s
+    | Pos {Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum} ->
+      pos_fname ^ ":" ^ string_of_int pos_lnum ^ ":"
+      ^ string_of_int (pos_cnum - pos_bol)
+end
+
 module type InputS = sig
   val timer_name : string
 
@@ -5,11 +19,11 @@ module type InputS = sig
 
   val init_data : data
 
-  val mod_data_start : string -> data -> data
+  val mod_data_start : Key.t -> data -> data
 
   val mod_data_stop : data -> data
 
-  val get_times_flush : data -> (string * float) list
+  val get_times_flush : data -> (Key.t * float) list
 end
 
 module type S = sig
@@ -23,7 +37,8 @@ module type S = sig
 end
 
 module Make (T : InputS) : S = struct
-  let print_time (name, t) =
+  let print_time (key, t) =
+    let name = Key.string_of key in
     Printf.fprintf stderr "[%s] %s\t%.3f\n%!" T.timer_name name t
 
 
@@ -31,30 +46,27 @@ module Make (T : InputS) : S = struct
 
   let stop () = data_ref := T.mod_data_stop !data_ref
 
-  let start name =
-    stop () ;
-    data_ref := T.mod_data_start name !data_ref
+  let start_common key =
+    stop ();
+    data_ref := T.mod_data_start key !data_ref
 
+  let start name = start_common (Key.Str name)
+
+  let start_here pos = start_common (Key.Pos pos)
 
   let flush () =
     stop () ;
     List.iter print_time (T.get_times_flush !data_ref) ;
     data_ref := T.init_data
-
-
-  let start_here pos =
-    let fname = pos.Lexing.pos_fname in
-    let lnum = pos.Lexing.pos_lnum in
-    start (fname ^ ":" ^ string_of_int lnum)
-
 end
+
 
 module Acc = struct
   let timer_name = "timer"
 
-  module M = Map.Make (String)
+  module M = Map.Make (Key)
 
-  type data = {cur_opt: (string * float) option; all: float M.t}
+  type data = {cur_opt: (Key.t * float) option; all: float M.t}
 
   let init_data = {cur_opt= None; all= M.empty}
 

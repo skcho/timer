@@ -1,4 +1,8 @@
 module Timer : sig
+  module Key : sig
+    type t
+  end
+
   module type InputS = sig
     val timer_name : string
 
@@ -6,11 +10,11 @@ module Timer : sig
 
     val init_data : data
 
-    val mod_data_start : string -> data -> data
+    val mod_data_start : Key.t -> data -> data
 
     val mod_data_stop : data -> data
 
-    val get_times_flush : data -> (string * float) list
+    val get_times_flush : data -> (Key.t * float) list
   end
 
   module type S = sig
