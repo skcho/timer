@@ -17,4 +17,4 @@ List.iter foo l;
 Timer.flush        (* All accumulated times are printed. *)
 ```
 
-See [test/test.ml](test.ml) for more cases.
+See [test.ml](test/test.ml) for more cases.
