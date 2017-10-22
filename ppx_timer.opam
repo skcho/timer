@@ -1,0 +1,21 @@
+opam-version: "1.2"
+name: "ppx_timer"
+version: "0.1"
+maintainer: "skcho <skcho@ropas.snu.ac.kr>"
+author: "skcho <skcho@ropas.snu.ac.kr>"
+homepage: "https://github.com/skcho/ppx_timer"
+bug-reports: "https://github.com/skcho/ppx_timer/issues"
+license: "Unlicense"
+dev-repo: "https://github.com/skcho/ppx_timer.git"
+build: [
+  ["jbuilder" "build" "-p" name "-j" jobs]
+]
+install: [make "install"]
+remove: [make "uninstall"]
+depends: [
+  "ocamlfind"
+  "jbuilder"
+  "ppx_core"
+  "ppx_driver"
+  "ppx_here"
+]

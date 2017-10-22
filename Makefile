@@ -1,13 +1,13 @@
-.PHONY: all timer install uninstall test clean
+.PHONY: all install uninstall test clean
 
-timer:
-	jbuilder build @install src/timer.cmxa
+all:
+	jbuilder build @install src/ppx_timer.cmxa
 
 install:
-	jbuilder install timer
+	jbuilder install ppx_timer
 
 uninstall:
-	jbuilder uninstall timer
+	jbuilder uninstall ppx_timer
 
 test:
 	jbuilder build test/test.exe
