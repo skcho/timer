@@ -1,15 +1,14 @@
 module Key = struct
-  type t =
-    | Str of string
-    | Pos of Lexing.position
+  type t = Str of string | Pos of Lexing.position
 
   let compare = compare
 
   let string_of = function
     | Str s -> s
     | Pos {Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum} ->
-      pos_fname ^ ":" ^ string_of_int pos_lnum ^ ":"
-      ^ string_of_int (pos_cnum - pos_bol)
+        pos_fname ^ ":" ^ string_of_int pos_lnum ^ ":"
+        ^ string_of_int (pos_cnum - pos_bol)
+
 end
 
 module type InputS = sig
@@ -47,8 +46,9 @@ module Make (T : InputS) : S = struct
   let stop () = data_ref := T.mod_data_stop !data_ref
 
   let start_common key =
-    stop ();
+    stop () ;
     data_ref := T.mod_data_start key !data_ref
+
 
   let start name = start_common (Key.Str name)
 
@@ -58,8 +58,8 @@ module Make (T : InputS) : S = struct
     stop () ;
     List.iter print_time (T.get_times_flush !data_ref) ;
     data_ref := T.init_data
-end
 
+end
 
 module Acc = struct
   let timer_name = "timer"
@@ -85,11 +85,11 @@ module Acc = struct
 
 
   let mod_data_start title {cur_opt; all} =
-    {cur_opt= Some (title, Sys.time ()); all = add_cur_opt cur_opt all}
+    {cur_opt= Some (title, Sys.time ()); all= add_cur_opt cur_opt all}
 
 
   let mod_data_stop {cur_opt; all} =
-    {cur_opt = None; all = add_cur_opt cur_opt all}
+    {cur_opt= None; all= add_cur_opt cur_opt all}
 
 
   let get_times_flush {all} =

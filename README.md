@@ -10,6 +10,8 @@ opam pin add ppx_timer https://github.com/skcho/ppx_timer.git
 
 ## example
 
+### basic
+
 ```ocaml
 open Ppx_timer
 
@@ -25,4 +27,16 @@ List.iter foo l;
 Timer.flush        (* All accumulated times are printed. *)
 ```
 
-See [test.ml](test/test.ml) for more cases.
+### using ppx
+
+`[%timer exp]` is expanded to
+
+```ocaml
+Timer.start_here [%here];
+let v = exp in
+Timer.stop ();
+v
+```
+to calculate the evaluation time of exp.
+
+See [test.ml](test/test.ml) for examples.
