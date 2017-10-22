@@ -10,8 +10,6 @@ dev-repo: "https://github.com/skcho/ppx_timer.git"
 build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
-install: [make "install"]
-remove: [make "uninstall"]
 depends: [
   "ocamlfind"
   "jbuilder"
@@ -19,3 +17,4 @@ depends: [
   "ppx_driver"
   "ppx_here"
 ]
+descr: "A simple timer for performance debugging"
