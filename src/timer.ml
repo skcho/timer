@@ -6,7 +6,7 @@ module Key = struct
   let string_of = function
     | Str s -> s
     | Pos {Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum} ->
-      Printf.sprintf "%s:%d:%d" pos_fname pos_lnum (pos_cnum - pos_bol)
+        Printf.sprintf "%s:%d:%d" pos_fname pos_lnum (pos_cnum - pos_bol)
 
 end
 
@@ -62,9 +62,16 @@ module Make (T : InputS) : S = struct
     List.iter print_time (T.get_times_flush !data_ref) ;
     data_ref := T.init_data
 
-  let exp name = start name ; fun v -> stop () ; v
 
-  let exp_here pos = start_here pos ; fun v -> stop () ; v
+  let exp name =
+    start name ;
+    fun v -> stop () ; v
+
+
+  let exp_here pos =
+    start_here pos ;
+    fun v -> stop () ; v
+
 end
 
 module Acc = struct

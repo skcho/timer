@@ -53,8 +53,8 @@ let my_timer () =
 
 
 let exp_timer () =
-  if (Timer.exp "a" @@ do_sth ()) = (Timer.exp_here [%here ] @@ do_sth ())
-  then () else () ;
+  if Timer.exp "a" @@ do_sth () = Timer.exp_here [%here ] @@ do_sth () then ()
+  else () ;
   Timer.flush ()
 
 
@@ -69,3 +69,4 @@ let () =
   test "simple timer + ppx_here" simple_here ;
   test "multiple timers + ppx_here" my_timer ;
   test "exp timer" exp_timer
+
