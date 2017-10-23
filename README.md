@@ -5,7 +5,7 @@ a simple timer for OCaml
 ## install
 
 ```
-opam pin add ppx_timer https://github.com/skcho/ppx_timer.git
+opam pin add timer https://github.com/skcho/timer.git
 ```
 
 ## example
@@ -13,8 +13,6 @@ opam pin add ppx_timer https://github.com/skcho/ppx_timer.git
 ### basic
 
 ```ocaml
-open Ppx_timer
-
 let foo x =
   Timer.start "a"; (* Timer "a" starts. *)
   ...
@@ -26,17 +24,5 @@ in
 List.iter foo l;
 Timer.flush        (* All accumulated times are printed. *)
 ```
-
-### using ppx
-
-`[%timer exp]` is expanded to
-
-```ocaml
-Timer.start_here [%here];
-let v = exp in
-Timer.stop ();
-v
-```
-to calculate the evaluation time of exp.
 
 See [test.ml](test/test.ml) for examples.

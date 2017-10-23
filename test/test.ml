@@ -1,5 +1,3 @@
-open Ppx_timer
-
 let do_sth () =
   let rec f n = if n < 0 then () else f (n - 1) in
   f 500000000
@@ -54,19 +52,6 @@ let my_timer () =
   MyTimerB.flush ()
 
 
-(* [%timer exp] is expanded to
-
-   Timer.start_here [%here];
-   let v = exp in
-   Timer.stop ();
-   v
-
-   to calculate the evaluation time of exp. *)
-let ppx_timer () =
-  if [%timer do_sth ()] <> () then [%timer do_sth ()] else [%timer do_sth ()] ;
-  Timer.flush ()
-
-
 let test title f =
   prerr_endline ("TEST: " ^ title) ;
   f () ;
@@ -76,6 +61,4 @@ let test title f =
 let () =
   test "simple timer" simple ;
   test "simple timer + ppx_here" simple_here ;
-  test "multiple timers + ppx_here" my_timer ;
-  test "ppx_timer (using ppx_here by default)" ppx_timer
-
+  test "multiple timers + ppx_here" my_timer

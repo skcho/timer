@@ -21,4 +21,4 @@ setup.log
 
 /src/.merlin
 /test/.merlin
-/ppx_timer.install
+/timer.install

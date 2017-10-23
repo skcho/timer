@@ -2,5 +2,5 @@
 
 (executable
  ((name test)
-  (libraries (ppx_timer))
-  (preprocess (pps (ppx_timer ppx_here)))))
+  (libraries (timer))
+  (preprocess (pps (ppx_here)))))

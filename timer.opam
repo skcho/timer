@@ -1,19 +1,17 @@
 opam-version: "1.2"
-name: "ppx_timer"
+name: "timer"
 version: "0.1"
 maintainer: "skcho <skcho@ropas.snu.ac.kr>"
 author: "skcho <skcho@ropas.snu.ac.kr>"
-homepage: "https://github.com/skcho/ppx_timer"
-bug-reports: "https://github.com/skcho/ppx_timer/issues"
+homepage: "https://github.com/skcho/timer"
+bug-reports: "https://github.com/skcho/timer/issues"
 license: "Unlicense"
-dev-repo: "https://github.com/skcho/ppx_timer.git"
+dev-repo: "https://github.com/skcho/timer.git"
 build: [
   ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 depends: [
   "ocamlfind"
   "jbuilder"
-  "ppx_core"
-  "ppx_driver"
 ]
 descr: "A simple timer for performance debugging"
