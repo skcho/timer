@@ -24,16 +24,14 @@ module type S = sig
   val stop : unit -> unit
 
   val flush : unit -> unit
+
+  val exp : string -> 'a -> 'a
+
+  val exp_here : Lexing.position -> 'a -> 'a
 end
 
 module Make (T : InputS) : S
 
 module Acc : InputS
 
-val start : string -> unit
-
-val start_here : Lexing.position -> unit
-
-val stop : unit -> unit
-
-val flush : unit -> unit
+include S

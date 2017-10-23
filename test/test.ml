@@ -52,6 +52,12 @@ let my_timer () =
   MyTimerB.flush ()
 
 
+let exp_timer () =
+  if (Timer.exp "a" @@ do_sth ()) = (Timer.exp_here [%here ] @@ do_sth ())
+  then () else () ;
+  Timer.flush ()
+
+
 let test title f =
   prerr_endline ("TEST: " ^ title) ;
   f () ;
@@ -61,4 +67,5 @@ let test title f =
 let () =
   test "simple timer" simple ;
   test "simple timer + ppx_here" simple_here ;
-  test "multiple timers + ppx_here" my_timer
+  test "multiple timers + ppx_here" my_timer ;
+  test "exp timer" exp_timer

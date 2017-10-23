@@ -32,6 +32,10 @@ module type S = sig
   val stop : unit -> unit
 
   val flush : unit -> unit
+
+  val exp : string -> 'a -> 'a
+
+  val exp_here : Lexing.position -> 'a -> 'a
 end
 
 module Make (T : InputS) : S = struct
@@ -58,6 +62,9 @@ module Make (T : InputS) : S = struct
     List.iter print_time (T.get_times_flush !data_ref) ;
     data_ref := T.init_data
 
+  let exp name = start name ; fun v -> stop () ; v
+
+  let exp_here pos = start_here pos ; fun v -> stop () ; v
 end
 
 module Acc = struct
