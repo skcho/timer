@@ -1,0 +1,4 @@
+(test
+ (name timer_test)
+ (libraries timer)
+ (preprocess (pps ppx_here)))

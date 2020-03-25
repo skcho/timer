@@ -24,10 +24,6 @@ module type S = sig
   val stop : unit -> unit
 
   val flush : unit -> unit
-
-  val exp : string -> 'a -> 'a
-
-  val exp_here : Lexing.position -> 'a -> 'a
 end
 
 module Make (T : InputS) : S

@@ -1,17 +1,15 @@
-opam-version: "1.2"
+opam-version: "2.0"
 name: "timer"
-version: "0.1"
-maintainer: "skcho <skcho@ropas.snu.ac.kr>"
-author: "skcho <skcho@ropas.snu.ac.kr>"
+version: "0.2"
+maintainer: "skcho <csk110@hotmail.com>"
+author: "skcho <csk110@hotmail.com>"
 homepage: "https://github.com/skcho/timer"
 bug-reports: "https://github.com/skcho/timer/issues"
 license: "Unlicense"
-dev-repo: "https://github.com/skcho/timer.git"
-build: [
-  ["jbuilder" "build" "-p" name "-j" jobs]
-]
+dev-repo: "git+https://github.com/skcho/timer.git"
+build: ["dune" "build" "-p" name "-j" jobs]
 depends: [
-  "ocamlfind"
-  "jbuilder"
+  "dune" {build}
+  "ppx_here"
 ]
 descr: "A simple timer for performance debugging"

@@ -1,16 +1,14 @@
 # timer
 
-a simple timer for OCaml
+A simple timer for OCaml
 
-## install
+## Install
 
 ```
 opam pin add timer https://github.com/skcho/timer.git
 ```
 
-## example
-
-### basic
+## Example
 
 ```ocaml
 let foo x =
@@ -25,4 +23,4 @@ List.iter foo l;
 Timer.flush        (* All accumulated times are printed. *)
 ```
 
-See [test.ml](test/test.ml) for examples.
+See [test](test/timer_test.ml) for more examples.

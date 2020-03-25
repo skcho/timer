@@ -1,6 +1,0 @@
-(jbuild_version 1)
-
-(library
- ((name timer)
-  (public_name timer)
-  (preprocess no_preprocessing)))

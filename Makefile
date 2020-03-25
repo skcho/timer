@@ -1,17 +1,16 @@
 .PHONY: all install uninstall test clean
 
 all:
-	jbuilder build @install src/timer.cmxa
+	dune build
 
 install:
-	jbuilder install timer
+	dune install timer
 
 uninstall:
-	jbuilder uninstall timer
+	dune uninstall timer
 
 test:
-	jbuilder build test/test.exe
-	_build/default/test/test.exe
+	dune runtest
 
 clean:
-	jbuilder clean
+	dune clean

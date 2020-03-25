@@ -5,9 +5,8 @@ module Key = struct
 
   let string_of = function
     | Str s -> s
-    | Pos {Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum} ->
+    | Pos { Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum } ->
         Printf.sprintf "%s:%d:%d" pos_fname pos_lnum (pos_cnum - pos_bol)
-
 end
 
 module type InputS = sig
@@ -32,10 +31,6 @@ module type S = sig
   val stop : unit -> unit
 
   val flush : unit -> unit
-
-  val exp : string -> 'a -> 'a
-
-  val exp_here : Lexing.position -> 'a -> 'a
 end
 
 module Make (T : InputS) : S = struct
@@ -43,35 +38,22 @@ module Make (T : InputS) : S = struct
     let name = Key.string_of key in
     Printf.fprintf stderr "[%s] %s\t%.3f\n%!" T.timer_name name t
 
-
   let data_ref = ref T.init_data
 
   let stop () = data_ref := T.mod_data_stop !data_ref
 
   let start_common key =
-    stop () ;
+    stop ();
     data_ref := T.mod_data_start key !data_ref
-
 
   let start name = start_common (Key.Str name)
 
   let start_here pos = start_common (Key.Pos pos)
 
   let flush () =
-    stop () ;
-    List.iter print_time (T.get_times_flush !data_ref) ;
+    stop ();
+    List.iter print_time (T.get_times_flush !data_ref);
     data_ref := T.init_data
-
-
-  let exp name =
-    start name ;
-    fun v -> stop () ; v
-
-
-  let exp_here pos =
-    start_here pos ;
-    fun v -> stop () ; v
-
 end
 
 module Acc = struct
@@ -79,35 +61,27 @@ module Acc = struct
 
   module M = Map.Make (Key)
 
-  type data = {cur_opt: (Key.t * float) option; all: float M.t}
+  type data = { cur_opt : (Key.t * float) option; all : float M.t }
 
-  let init_data = {cur_opt= None; all= M.empty}
+  let init_data = { cur_opt = None; all = M.empty }
 
   let add_time name time all =
-    let all_time =
-      try M.find name all
-      with Not_found -> 0.0
-    in
+    let all_time = try M.find name all with Not_found -> 0.0 in
     M.add name (time +. all_time) all
-
 
   let add_cur_opt cur_opt all =
     match cur_opt with
     | None -> all
     | Some (name, start) -> add_time name (Sys.time () -. start) all
 
+  let mod_data_start title { cur_opt; all } =
+    { cur_opt = Some (title, Sys.time ()); all = add_cur_opt cur_opt all }
 
-  let mod_data_start title {cur_opt; all} =
-    {cur_opt= Some (title, Sys.time ()); all= add_cur_opt cur_opt all}
+  let mod_data_stop { cur_opt; all } =
+    { cur_opt = None; all = add_cur_opt cur_opt all }
 
-
-  let mod_data_stop {cur_opt; all} =
-    {cur_opt= None; all= add_cur_opt cur_opt all}
-
-
-  let get_times_flush {all} =
+  let get_times_flush { all; _ } =
     M.fold (fun name time acc -> (name, time) :: acc) all [] |> List.rev
-
 end
 
 include Make (Acc)
